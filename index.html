@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <title>Hub de Estudos (Supabase)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background:#f8f9fa; margin:0; padding:0; }
+    header { background:linear-gradient(135deg,#007bff,#0056b3); color:#fff; text-align:center; padding:30px 20px; }
+    .container { max-width:900px; margin:40px auto; padding:0 20px; }
+    .painel { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:20px; }
+    .card { background:#fff; border-radius:12px; padding:20px; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+    .card h3 { margin:0; color:#007bff; }
+    .card p { color:#6c757d; font-size:0.9em; }
+    .card a { display:inline-block; margin-top:12px; padding:10px 20px; background:#007bff; color:#fff; border-radius:8px; text-decoration:none; font-weight:bold; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>📚 Hub de Estudos</h1>
+    <p>Matérias carregadas do Supabase</p>
+  </header>
+  <main class="container">
+    <div class="painel" id="painel"></div>
+  </main>
+
+  <script>
+    // 🔑 substitua com os dados do seu projeto Supabase
+    const SUPABASE_URL = "https://xxxxx.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOi..."; // anon public key
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    async function carregarMaterias() {
+      let { data, error } = await supabase.from("materias").select("*").order("id", { ascending: true });
+      if (error) {
+        console.error(error);
+        document.getElementById("painel").innerHTML = "<p>Erro ao carregar matérias.</p>";
+        return;
+      }
+
+      const painel = document.getElementById("painel");
+      painel.innerHTML = "";
+      data.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <h3>${m.titulo}</h3>
+          <p>${m.descricao}</p>
+          <a href="${m.link}">📖 Abrir</a>
+        `;
+        painel.appendChild(card);
+      });
+    }
+
+    carregarMaterias();
+  </script>
+</body>
+</html>
