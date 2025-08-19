@@ -2,9 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Hub de Estudos (Supabase)</title>
+  <title>Arquivos</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Importa a biblioteca Supabase v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/supabase.min.js"></script>
   <style>
     body { font-family: Arial, sans-serif; background:#f8f9fa; margin:0; padding:0; }
     header { background:linear-gradient(135deg,#007bff,#0056b3); color:#fff; text-align:center; padding:30px 20px; }
@@ -18,28 +19,44 @@
 </head>
 <body>
   <header>
-    <h1>📚 Hub de Estudos</h1>
-    <p>Matérias carregadas do Supabase</p>
+    <h1>📚 Arquivos</h1>
+    <p>Acesse algo de seu interesse abaixo</p>
   </header>
   <main class="container">
-    <div class="painel" id="painel"></div>
+    <div class="painel" id="painel">
+      <p>Carregando matérias...</p>
+    </div>
   </main>
 
   <script>
-    // 🔑 substitua com os dados do seu projeto Supabase
+    // 🔑 Substitua com os dados do seu projeto Supabase
     const SUPABASE_URL = "https://kdaipxlazhsdpiuggauh.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkYWlweGxhemhzZHBpdWdnYXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NDI5NTMsImV4cCI6MjA3MTIxODk1M30.8iJCbZNOwlRxjdxAittH7b_X_F1_A9n0hZfFOBZFiu8"; // anon public key
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkYWlweGxhemhzZHBpdWdnYXVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU2NDI5NTMsImV4cCI6MjA3MTIxODk1M30.8iJCbZNOwlRxjdxAittH7b_X_F1_A9n0hZfFOBZFiu8"; 
 
+    // Cria o cliente Supabase
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Função para carregar matérias do Supabase
     async function carregarMaterias() {
-      let { data, error } = await supabase.from("materias").select("*").order("id", { ascending: true });
+      const painel = document.getElementById("painel");
+      painel.innerHTML = "<p>Carregando matérias...</p>";
+
+      const { data, error } = await client
+        .from("materias")
+        .select("*")
+        .order("id", { ascending: true });
+
       if (error) {
         console.error(error);
-        document.getElementById("painel").innerHTML = "<p>Erro ao carregar matérias.</p>";
+        painel.innerHTML = "<p>Erro ao carregar matérias.</p>";
         return;
       }
 
-      const painel = document.getElementById("painel");
+      if (!data || data.length === 0) {
+        painel.innerHTML = "<p>Nenhuma matéria encontrada.</p>";
+        return;
+      }
+
       painel.innerHTML = "";
       data.forEach(m => {
         const card = document.createElement("div");
@@ -47,12 +64,13 @@
         card.innerHTML = `
           <h3>${m.titulo}</h3>
           <p>${m.descricao}</p>
-          <a href="${m.link}">📖 Abrir</a>
+          <a href="${m.link}" target="_blank">📖 Abrir</a>
         `;
         painel.appendChild(card);
       });
     }
 
+    // Carrega as matérias ao abrir a página
     carregarMaterias();
   </script>
 </body>
